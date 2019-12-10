@@ -19,6 +19,7 @@
 
 namespace LiamW\APIImprovements\Entity;
 
+use LiamW\APIImprovements\Utils;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Structure;
 use XF\Util\Random;
@@ -27,7 +28,6 @@ use XF\Util\Random;
  * COLUMNS
  * @property string token
  * @property string code
- * @property string client_id
  * @property int creation_date
  *
  * GETTERS
@@ -35,7 +35,6 @@ use XF\Util\Random;
  * @property mixed user_id
  *
  * RELATIONS
- * @property \LiamW\APIImprovements\Entity\OAuthClient OAuthClient
  * @property \LiamW\APIImprovements\Entity\OAuthCode OAuthCode
  */
 class OAuthToken extends Entity
@@ -57,16 +56,11 @@ class OAuthToken extends Entity
 		return $this->OAuthCode->user_id;
 	}
 
-	public function generateKeyValue($prefix = '', $length = 64)
-	{
-		return $prefix . substr(bin2hex(Random::getRandomBytes($length)), 0, $length - strlen($prefix));
-	}
-
 	protected function _preSave()
 	{
 		if ($this->isInsert())
 		{
-			$this->token = $this->generateKeyValue('token_');
+			$this->token = Utils::generateKeyValue('token_');
 		}
 	}
 
@@ -85,10 +79,6 @@ class OAuthToken extends Entity
 				'type' => self::STR,
 				'maxLength' => 64
 			],
-			'client_id' => [
-				'type' => self::STR,
-				'required' => true
-			],
 			'creation_date' => [
 				'type' => self::UINT,
 				'default' => \XF::$time
@@ -99,12 +89,6 @@ class OAuthToken extends Entity
 			'user_id' => true
 		];
 		$structure->relations = [
-			'OAuthClient' => [
-				'entity' => 'LiamW\APIImprovements:OAuthClient',
-				'type' => self::TO_ONE,
-				'conditions' => 'client_id',
-				'primary' => true
-			],
 			'OAuthCode' => [
 				'entity' => 'LiamW\APIImprovements:OAuthCode',
 				'type' => self::TO_ONE,
@@ -113,8 +97,7 @@ class OAuthToken extends Entity
 			]
 		];
 		$structure->defaultWith = [
-			'OAuthCode',
-			'OAuthClient'
+			'OAuthCode'
 		];
 
 		return $structure;

@@ -48,24 +48,22 @@ class Setup extends AbstractSetup
 			$table->addUniqueKey('client_secret');
 		});
 
-		$this->schemaManager()->createTable('xf_liamw_apiimprovements_oauth2_code', function (\XF\Db\Schema\Create $table)
+		$this->schemaManager()->createTable('xf_liamw_apiimprovements_oauth2_code', function(\XF\Db\Schema\Create $table)
 		{
 			$table->addColumn('code', 'varchar', 64)->primaryKey();
-			$table->addColumn('client_id', 'text');
+			$table->addColumn('authorization_request_id', 'text');
 			$table->addColumn('creation_date', 'int')->setDefault(0);
 			$table->addColumn('user_id', 'int');
 			$table->addColumn('extra', 'blob');
 			$table->addKey('user_id');
-			$table->addKey('client_id');
+			$table->addKey('authorization_request_id');
 		});
 
 		$this->schemaManager()->createTable('xf_liamw_apiimprovements_oauth2_token', function (\XF\Db\Schema\Create $table)
 		{
 			$table->addColumn('token', 'varchar', 64)->primaryKey();
 			$table->addColumn('code', 'varchar', 64);
-			$table->addColumn('client_id', 'text');
 			$table->addColumn('creation_date', 'int')->setDefault(0);
-			$table->addKey('client_id');
 			$table->addKey('code');
 		});
 

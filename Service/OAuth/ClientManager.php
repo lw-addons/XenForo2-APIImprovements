@@ -28,6 +28,9 @@ class ClientManager extends AbstractService
 {
 	use ValidateAndSavableTrait;
 
+	const TYPE_PUBLIC = 'public';
+	const TYPE_CONFIDENTIAL = 'confidential';
+
 	protected $client;
 
 	public function __construct(\XF\App $app, OAuthClient $client)
@@ -43,6 +46,11 @@ class ClientManager extends AbstractService
 	public function getClient()
 	{
 		return $this->client;
+	}
+
+	public function setType($type)
+	{
+		$this->client->type = $type;
 	}
 
 	public function setLabel($label)

@@ -19,6 +19,7 @@
 
 namespace LiamW\APIImprovements\Entity;
 
+use LiamW\APIImprovements\Utils;
 use OAuth\Common\Http\Uri\Uri;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Structure;
@@ -81,14 +82,14 @@ class OAuthClient extends Entity
 			}
 			catch (\InvalidArgumentException $e)
 			{
-				$this->error("~~Please enter valid URIs~~", 'redirect_uris');
+				$this->error("~~Please enter valid URIs. The scheme must be specified.~~", 'redirect_uris');
 
 				return false;
 			}
 
-			if ($uri->getScheme() != 'https')
+			if ($uri->getScheme() == 'http')
 			{
-				$this->error("~~Redirect URIs must use the https scheme~~", 'redirect_uris');
+				$this->error("~~HTTP URIs must use the https scheme~~", 'redirect_uris');
 
 				return false;
 			}
@@ -106,17 +107,12 @@ class OAuthClient extends Entity
 		return true;
 	}
 
-	public function generateKeyValue($prefix = '', $length = 64)
-	{
-		return $prefix . substr(bin2hex(Random::getRandomBytes($length)), 0, $length - strlen($prefix));
-	}
-
 	protected function _preSave()
 	{
 		if ($this->isInsert())
 		{
-			$this->client_id = $this->generateKeyValue('client_', 32);
-			$this->client_secret = $this->generateKeyValue();
+			$this->client_id = Utils::generateKeyValue('client_', 32);
+			$this->client_secret = Utils::generateKeyValue();
 		}
 
 		if (!count($this->redirect_uris))
@@ -191,5 +187,10 @@ class OAuthClient extends Entity
 		];
 
 		return $structure;
+	}
+
+	protected function _setupDefaults()
+	{
+		$this->redirect_uris = [];
 	}
 }

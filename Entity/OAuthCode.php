@@ -19,14 +19,16 @@
 
 namespace LiamW\APIImprovements\Entity;
 
+use LiamW\APIImprovements\Utils;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Structure;
 use XF\Util\Random;
 
 /**
  * COLUMNS
+ *
  * @property string code
- * @property string client_id
+ * @property string authorization_request_id
  * @property int creation_date
  * @property int user_id
  * @property array extra
@@ -35,7 +37,7 @@ use XF\Util\Random;
  * @property mixed expiry_date
  *
  * RELATIONS
- * @property \LiamW\APIImprovements\Entity\OAuthClient OAuthClient
+ * @property \LiamW\APIImprovements\Entity\OAuthAuthorizationRequest OAuthAuthorizationRequest
  * @property \XF\Mvc\Entity\AbstractCollection|\LiamW\APIImprovements\Entity\OAuthToken[] OAuthTokens
  * @property \XF\Entity\User User
  */
@@ -53,28 +55,11 @@ class OAuthCode extends Entity
 		return $this->expiry_date < \XF::$time;
 	}
 
-	public function generateKeyValue($prefix = '', $length = 64)
-	{
-		return $prefix . substr(bin2hex(Random::getRandomBytes($length)), 0, $length - strlen($prefix));
-	}
-
-	public function createToken()
-	{
-		/** @var OAuthToken $token */
-		$token = $this->em()->create('LiamW\APIImprovements:OAuthToken');
-		$token->code = $this->code;
-		$token->client_id = $this->client_id;
-		$token->user_id = $this->user_id;
-		$token->save();
-
-		return $token;
-	}
-
 	protected function _preSave()
 	{
 		if ($this->isInsert())
 		{
-			$this->code = $this->generateKeyValue('code_');
+			$this->code = Utils::generateKeyValue('code_');
 		}
 	}
 
@@ -89,7 +74,7 @@ class OAuthCode extends Entity
 				'type' => self::STR,
 				'maxLength' => 64
 			],
-			'client_id' => [
+			'authorization_request_id' => [
 				'type' => self::STR,
 				'required' => true
 			],
@@ -109,10 +94,10 @@ class OAuthCode extends Entity
 			'expiry_date' => true
 		];
 		$structure->relations = [
-			'OAuthClient' => [
-				'entity' => 'LiamW\APIImprovements:OAuthClient',
+			'OAuthAuthorizationRequest' => [
+				'entity' => 'LiamW\APIImprovements:OAuthAuthorizationRequest',
 				'type' => self::TO_ONE,
-				'conditions' => 'client_id',
+				'conditions' => 'authorization_request_id',
 				'primary' => true
 			],
 			'OAuthTokens' => [
@@ -128,6 +113,7 @@ class OAuthCode extends Entity
 				'primary' => true
 			]
 		];
+		$structure->defaultWith = ['OAuthAuthorizationRequest'];
 
 		return $structure;
 	}

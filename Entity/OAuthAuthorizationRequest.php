@@ -19,11 +19,14 @@
 
 namespace LiamW\APIImprovements\Entity;
 
+use LiamW\APIImprovements\Utils;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Structure;
+use XF\Util\Random;
 
 /**
  * COLUMNS
+ *
  * @property string authorization_request_id
  * @property string client_id
  * @property int user_id
@@ -42,6 +45,14 @@ use XF\Mvc\Entity\Structure;
  */
 class OAuthAuthorizationRequest extends Entity
 {
+	protected function _preSave()
+	{
+		if ($this->isInsert())
+		{
+			$this->authorization_request_id = Utils::generateKeyValue('authorization_request_');
+		}
+	}
+
 	public static function getStructure(Structure $structure)
 	{
 		$structure->shortName = 'LiamW\APIImprovements:OAuthAuthorizationRequest';
@@ -109,6 +120,7 @@ class OAuthAuthorizationRequest extends Entity
 				'primary' => true
 			]
 		];
+		$structure->defaultWith = ['OAuthClient'];
 
 		return $structure;
 	}

@@ -2,7 +2,7 @@
     "admin/liamw_apiimprovements_oauth_client_edit.html": {
         "version_id": 1000010,
         "version_string": "1.0.0 Alpha",
-        "hash": "ec3f948cb15b3f6bd31b6a57ca5a9539"
+        "hash": "b7b1d80b1ddef3d544068d6308a8503a"
     },
     "admin/liamw_apiimprovements_oauth_client_list.html": {
         "version_id": 1000010,
@@ -17,6 +17,6 @@
     "public/liamw_apiimprovements_oauth2_client_grant.html": {
         "version_id": 1000010,
         "version_string": "1.0.0 Alpha",
-        "hash": "326f1ccff1dbc56291b7c7f19de9fe8a"
+        "hash": "cf49b6d49038b7f78bd29ce77750ae61"
     }
 }

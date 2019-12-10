@@ -1,6 +1,6 @@
 <xf:if is="$client.isInsert()">
 	<xf:title>~~Add OAuth2 client~~</xf:title>
-<xf:else/>
+	<xf:else/>
 	<xf:title>~~Edit OAuth2 client~~</xf:title>
 </xf:if>
 
@@ -31,14 +31,36 @@
 				<xf:explain>~~Provide a label for this client when shown in the client list.~~</xf:explain>
 			</xf:textboxrow>
 
+			<xf:textarearow name="description" label="~~Description~~" value="{$client.description}"
+				hint="{{ phrase('optional') }}" explain="~~This is displayed to users when they authorize your client.~~" rows="5"/>
+
+			<xf:if is="$client.isInsert()">
+				<xf:radiorow label="~~Client type~~" name="type" value="{$client.type}">
+					<xf:option value="public">~~Public~~</xf:option>
+					<xf:option value="confidential">~~Confidential~~</xf:option>
+				</xf:radiorow>
+				<xf:else/>
+				<xf:formrow label="~~Client type~~" explain="~~This cannot be changed.~~">
+					<xf:if is="$client.type == 'public'">
+						~~Public~~
+						<xf:elseif is="$client.type == 'confidential'"/>
+						~~Confidential~~
+						<xf:else/>
+						{$client.type}
+					</xf:if>
+				</xf:formrow>
+			</xf:if>
+
 			<xf:formrow label="~~Redirect URIs~~" rowtype="input">
 				<ul class="listPlain inputGroup-container">
 					<xf:foreach loop="$client.redirect_uris_" key="$i" value="$redirectUri">
-						<li class="inputGroup"><xf:textbox type="url" name="redirect_uris[{$i}]" value="{$redirectUri}" /></li>
+						<li class="inputGroup">
+							<xf:textbox type="url" name="redirect_uris[{$i}]" value="{$redirectUri}"/>
+						</li>
 					</xf:foreach>
 
 					<li class="inputGroup" data-xf-init="field-adder" data-increment-format="redirect_uris[{counter}]">
-						<xf:textbox type="url" name="redirect_uris[{{ count($client.redirect_uris) }}]" />
+						<xf:textbox type="url" name="redirect_uris[{{ count($client.redirect_uris) }}]"/>
 					</li>
 				</ul>
 			</xf:formrow>
@@ -51,6 +73,6 @@
 					hint="~~Use this to disable the client~~"/>
 			</xf:checkboxrow>
 		</div>
-		<xf:submitrow icon="save" sticky="true" />
+		<xf:submitrow icon="save" sticky="true"/>
 	</div>
 </xf:form>

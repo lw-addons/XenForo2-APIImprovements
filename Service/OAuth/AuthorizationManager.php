@@ -66,7 +66,7 @@ class AuthorizationManager extends AbstractService
 	{
 		/** @var OAuthCode $code */
 		$code = $this->em()->create('LiamW\APIImprovements:OAuthCode');
-		$code->client_id = $this->client->client_id;
+		$code->authorization_request_id = $authorizationRequest->authorization_request_id;
 		$code->user_id = $authorizationRequest->user_id;
 		$code->extra = [
 			'code_challenge' => $authorizationRequest->code_challenge,
@@ -80,12 +80,12 @@ class AuthorizationManager extends AbstractService
 
 	public function createOAuthToken(OAuthCode $code, $codeVerifier, &$oauthError, &$oauthErrorDescription)
 	{
-		if ($code->client_id != $this->client->client_id)
+		if ($code->OAuthAuthorizationRequest->client_id != $this->client->client_id)
 		{
 			throw new \InvalidArgumentException("Code does not match client");
 		}
 
-		if ($code->extra['code_challenge_method'] != 'S256')
+		if ($code->OAuthAuthorizationRequest->OAuthClient->type == 'public' && $code->extra['code_challenge_method'] != 'S256')
 		{
 			throw new \RuntimeException("Invalid code_challenge_method found for passed code.");
 		}
@@ -105,7 +105,7 @@ class AuthorizationManager extends AbstractService
 			return null;
 		}
 
-		if (Utils::s256($codeVerifier) !== $code->extra['code_challenge'])
+		if ($code->extra['code_challenge_method'] && Utils::s256($codeVerifier) !== $code->extra['code_challenge'])
 		{
 			$oauthError = 'invalid_request';
 			$oauthErrorDescription = 'The code verifier does not match';
@@ -116,8 +116,6 @@ class AuthorizationManager extends AbstractService
 		/** @var OAuthToken $token */
 		$token = $this->em()->create('LiamW\APIImprovements:OAuthToken');
 		$token->code = $code->code;
-		$token->client_id = $this->client->client_id;
-		$token->user_id = $code->user_id;
 		$token->save();
 
 		return $token;

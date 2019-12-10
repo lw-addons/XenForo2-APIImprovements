@@ -21,6 +21,7 @@ namespace LiamW\APIImprovements\XF\Pub\Controller;
 
 use LiamW\APIImprovements\Entity\OAuthClient;
 use LiamW\APIImprovements\Repository\OAuth;
+use LiamW\APIImprovements\Service\OAuth\AuthorizationManager;
 use OAuth\Common\Http\Uri\Uri;
 
 class Account extends XFCP_Account
@@ -38,13 +39,11 @@ class Account extends XFCP_Account
 
 		list($responseType, $redirectUri, $codeChallenge, $codeChallengeMethod, $state) = $this->verifyOAuthRequestParameters($client);
 
-
+		$authorizationRequest = $this->service('LiamW\APIImprovements:OAuth\AuthorizationManager', $client)->createAuthorizationRequest($responseType, $redirectUri, $codeChallenge, $codeChallengeMethod, $state);
 
 		$viewParams = [
 			'client' => $client,
-			'responseType' => $responseType,
-			'redirectUri' => $redirectUri,
-			'state' => $state
+			'authorizationRequest' => $authorizationRequest
 		];
 
 		return $this->view('LiamW\APIImprovements:Account\OAuth2\Grant', 'liamw_apiimprovements_oauth2_client_grant', $viewParams);
@@ -54,35 +53,15 @@ class Account extends XFCP_Account
 	{
 		$this->assertValidCsrfToken();
 
-		/** @var OAuth $repository */
-		$repository = $this->repository('LiamW\APIImprovements:OAuth');
+		$authorizationRequest = $this->assertValidAuthorizationRequestForVisitor();
 
-		$clientId = $this->filter('client_id', 'str');
-		/** @var OAuthClient $client */
-		$client = $repository->findActiveOAuthClient($clientId);
-		if (!$client)
-		{
-			return $this->error("~~Unknown or invalid client.~~", 400);
-		}
+		/** @var AuthorizationManager $authorizationManager */
+		$authorizationManager = $this->service('LiamW\APIImprovements:OAuth\AuthorizationManager', $authorizationRequest->OAuthClient);
 
-		$input = $this->filter([
-			'redirect_uri' => '?str',
-			'response_type' => 'str',
-			'state' => '?str'
-		]);
+		$code = $authorizationManager->createAuthorizationCode($authorizationRequest);
 
-		list(, $redirectUri, $state) = $this->verifyOAuthRequestParameters($client, $input);
-
-		$code = $client->createCode($redirectUri);
-
-		\XF::dumpToFile($repository->buildRedirectUri($redirectUri, [
-			'code' => $code->code,
-			'state' => $state
-		]));
-
-		return $this->redirect($repository->buildRedirectUri($redirectUri, [
-			'code' => $code,
-			'state' => $state
+		return $this->redirect($this->repository('LiamW\APIImprovements:OAuth')->buildRedirectUriFromAuthorizationRequest($authorizationRequest, [
+			'code' => $code->code
 		]));
 	}
 
@@ -111,6 +90,31 @@ class Account extends XFCP_Account
 		]);
 
 		return $this->redirect($uri);
+	}
+
+	/**
+	 * @param null $authzRequestId
+	 *
+	 * @return \LiamW\APIImprovements\Entity\OAuthAuthorizationRequest|\XF\Mvc\Entity\Entity|null
+	 */
+	protected function assertValidAuthorizationRequestForVisitor($authzRequestId = null)
+	{
+		if ($authzRequestId === null)
+		{
+			$authzRequestId = $this->filter('authorization_request_id', 'str');
+		}
+
+		$authzRequest = $this->em()->findOne('LiamW\APIImprovements:OAuthAuthorizationRequest', [
+			'authorization_request_id' => $authzRequestId,
+			'user_id' => \XF::visitor()->user_id
+		]);
+
+		if (!$authzRequest)
+		{
+			throw $this->exception($this->notFound());
+		}
+
+		return $authzRequest;
 	}
 
 	protected function verifyOAuthRequestParameters(OAuthClient $client)

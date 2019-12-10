@@ -88,12 +88,14 @@ class OAuthClient extends AbstractController
 		{
 			$input = $this->filter([
 				'label' => 'str',
+				'type' => 'str',
 				'description' => '?str',
 				'redirect_uris' => 'array-str',
 				'active' => 'bool',
 				'username' => '?str'
 			]);
 
+			$clientManager->setType($input['type'] == 'confidential' ? ClientManager::TYPE_CONFIDENTIAL : ClientManager::TYPE_PUBLIC);
 			$clientManager->setLabel($input['label']);
 			$clientManager->setDescription($input['description']);
 			$clientManager->setRedirectURIs($input['redirect_uris']);

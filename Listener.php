@@ -88,9 +88,9 @@ class Listener
 						$token = $authorization;
 
 						$token = \XF::repository('LiamW\APIImprovements:OAuth')->findOAuthToken($token);
-						if ($token && !$token->is_expired)
+						if ($token && !$token->hasExpired())
 						{
-							$result = $token->User;
+							$result = $token->OAuthCode->User;
 
 							return;
 						}

@@ -22,6 +22,7 @@ namespace LiamW\APIImprovements\XF\Api\Controller;
 use LiamW\APIImprovements\Entity\OAuthClient;
 use LiamW\APIImprovements\Entity\OAuthCode;
 use LiamW\APIImprovements\Entity\OAuthToken;
+use LiamW\APIImprovements\Service\OAuth\AuthorizationManager;
 
 class Auth extends XFCP_Auth
 {
@@ -37,7 +38,8 @@ class Auth extends XFCP_Auth
 		$input = $this->filter([
 			'grant_type' => 'str',
 			'code' => 'str',
-			'redirect_uri' => 'str'
+			'redirect_uri' => '?str',
+			'code_verifier' => '?str'
 		]);
 
 		switch ($input['grant_type'])
@@ -45,27 +47,35 @@ class Auth extends XFCP_Auth
 			case 'authorization_code':
 				/** @var OAuthCode $code */ $code = $this->repository('LiamW\APIImprovements:OAuth')->findPendingCode($input['code'], $input['redirect_uri']);
 
-				if (!$code)
+				if (!$code || $code->hasExpired())
 				{
 					return $this->apiError(null, null, [
 						'error' => 'invalid_grant'
 					], 400);
 				}
 
-				$token = $code->createToken();
+				/** @var AuthorizationManager $authzManager */
+				$authzManager = $this->service('LiamW\APIImprovements:OAuth\AuthorizationManager', $code->OAuthAuthorizationRequest->OAuthClient);
+				$token = $authzManager->createOAuthToken($code, $input['code_verifier'], $oauthError, $oauthErrorDescription);
 
-				if ($token->expiry_date < \XF::$time)
+				if ($oauthError === null)
 				{
-					return $this->apiError(null, null, [
-						'error' => 'invalid_grant'
-					], 400);
-				}
+					$this->app->response()->header('Cache-Control', 'no-store', true);
+					$this->app->response()->header('Pragma', 'no-cache', true);
 
-				return $this->apiResult([
-					'access_token' => $token->token,
-					'token_type' => 'bearer',
-					'expires_in' => OAuthToken::TOKEN_LIFETIME_SECONDS
-				]);
+					return $this->apiResult([
+						'access_token' => $token->token,
+						'token_type' => 'bearer',
+						'expires_in' => OAuthToken::TOKEN_LIFETIME_SECONDS
+					]);
+				}
+				else
+				{
+					return $this->apiResult([
+						'error' => $oauthError,
+						'error_description' => $oauthErrorDescription
+					]);
+				}
 				break;
 		}
 

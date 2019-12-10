@@ -12,12 +12,12 @@
 			</ul>
 
 			<xf:button
-				href="{{ link('account/oauth2/authorize', null, {'client_id': $client.client_id, 'redirect_uri': $redirectUri, 'response_type': $responseType, 'state': $state, '_xfToken': csrf_token()}) }}">
+				href="{{ link('account/oauth2/authorize', null, {'authorization_request_id': $authorizationRequest.authorization_request_id, '_xfToken': csrf_token()}) }}">
 				~~Authorise {$client.label}~~
 			</xf:button>
 
 			<xf:button
-				href="{{ link('account/oauth2/deny', null, {'client_id': $client.client_id, 'redirect_uri': $redirectUri, 'response_type': $responseType, 'state': $state}) }}">
+				href="{{ link('account/oauth2/deny', null, {'authorization_request_id': $authorizationRequest.authorization_request_id}) }}">
 				~~Deny {$client.label}~~
 			</xf:button>
 		</div>

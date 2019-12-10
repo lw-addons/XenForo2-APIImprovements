@@ -1,1 +1,1 @@
-OAuth clients
+OAuth2 clients

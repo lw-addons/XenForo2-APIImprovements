@@ -19,6 +19,7 @@
 
 namespace LiamW\APIImprovements\Repository;
 
+use LiamW\APIImprovements\Entity\OAuthAuthorizationRequest;
 use LiamW\APIImprovements\Entity\OAuthClient;
 use LiamW\APIImprovements\Entity\OAuthCode;
 use LiamW\APIImprovements\Entity\OAuthToken;
@@ -49,7 +50,7 @@ class OAuth extends Repository
 	public function findPendingCode($code, $redirectUri)
 	{
 		$finder = $this->finder('LiamW\APIImprovements:OAuthCode')->whereId($code);
-		$finder->where('redirect_uri_hash', sha1($redirectUri));
+		$finder->where('OAuthAuthorizationRequest.redirect_uri', $redirectUri);
 
 		return $finder->fetchOne();
 	}
@@ -84,5 +85,10 @@ class OAuth extends Repository
 		}
 
 		return $redirectUri->getAbsoluteUri();
+	}
+
+	public function buildRedirectUriFromAuthorizationRequest(OAuthAuthorizationRequest $authorizationRequest, array $queryParams)
+	{
+		return $this->buildRedirectUri(new Uri($authorizationRequest->redirect_uri), $authorizationRequest->state, $queryParams);
 	}
 }

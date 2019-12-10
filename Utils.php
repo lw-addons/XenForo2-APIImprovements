@@ -19,11 +19,18 @@
 
 namespace LiamW\APIImprovements;
 
+use XF\Util\Random;
+
 class Utils
 {
 	public static function s256($codeVerifier)
 	{
 		return self::base64url_encode(hash('sha256', $codeVerifier, true));
+	}
+
+	public static function generateKeyValue($prefix = '', $length = 64)
+	{
+		return $prefix . substr(self::base64url_encode(bin2hex(Random::getRandomBytes($length))), 0, $length - strlen($prefix));
 	}
 
 	// https://www.php.net/manual/en/function.base64-encode.php#123098
