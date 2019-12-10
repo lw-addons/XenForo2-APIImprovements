@@ -1,0 +1,22 @@
+{
+    "admin/liamw_apiimprovements_oauth_client_edit.html": {
+        "version_id": 1000010,
+        "version_string": "1.0.0 Alpha",
+        "hash": "ec3f948cb15b3f6bd31b6a57ca5a9539"
+    },
+    "admin/liamw_apiimprovements_oauth_client_list.html": {
+        "version_id": 1000010,
+        "version_string": "1.0.0 Alpha",
+        "hash": "548d0cd8aa3fc1e1b0ed7aa39a580bef"
+    },
+    "admin/oauth_client_macros.html": {
+        "version_id": 1000010,
+        "version_string": "1.0.0 Alpha",
+        "hash": "57ac94b59f022831b7574296f6942f00"
+    },
+    "public/liamw_apiimprovements_oauth2_client_grant.html": {
+        "version_id": 1000010,
+        "version_string": "1.0.0 Alpha",
+        "hash": "326f1ccff1dbc56291b7c7f19de9fe8a"
+    }
+}

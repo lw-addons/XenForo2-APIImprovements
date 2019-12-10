@@ -1,0 +1,17 @@
+<xf:macro name="copy_client_id" arg-client="!">
+	<code class="js-copyTarget">{$client.client_id}</code>
+	<xf:button icon="copy"
+		data-xf-init="copy-to-clipboard"
+		data-copy-target=".js-copyTarget"
+		data-success="~~Client ID copied to clipboard~~"
+		class="button--link" />
+</xf:macro>
+
+<xf:macro name="copy_client_secret" arg-client="!">
+	<code class="js-copyTarget">{$client.client_secret}</code>
+	<xf:button icon="copy"
+		data-xf-init="copy-to-clipboard"
+		data-copy-target=".js-copyTarget"
+		data-success="~~Client secret copied to clipboard~~"
+		class="button--link" />
+</xf:macro>

@@ -1,0 +1,11 @@
+{
+    "route_type": "admin",
+    "route_prefix": "oauth-clients",
+    "sub_name": "",
+    "format": ":str<client_id>/",
+    "build_class": "",
+    "build_method": "",
+    "controller": "LiamW\\APIImprovements:OAuthClient",
+    "context": "liamw_oauthclients",
+    "action_prefix": ""
+}

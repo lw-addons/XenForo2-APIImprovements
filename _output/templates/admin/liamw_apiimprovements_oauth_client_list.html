@@ -1,0 +1,54 @@
+<xf:title>~~OAuth2 clients~~</xf:title>
+
+<xf:pageaction>
+	<xf:button href="{{ link('oauth-clients/add') }}" icon="add">~~Add OAuth2 client~~</xf:button>
+</xf:pageaction>
+
+<xf:if is="$newClient">
+	<div class="blockMessage blockMessage--important blockMessage--iconic">
+		~~The client '{$newClient.label}' has been created. The credentials for the client are below. Please save the client secret, as it will not be shown again.~~
+		<div style="margin: 1em 0; text-align: center">~~Client ID: <xf:macro template="oauth_client_macros" name="copy_client_id" arg-client="{$newClient}" />~~</div>
+		<div style="margin: 1em 0; text-align: center">~~Client Secret: <xf:macro template="oauth_client_macros" name="copy_client_secret" arg-client="{$newClient}" />~~</div>
+	</div>
+</xf:if>
+
+<xf:if is="$clients is not empty">
+	<xf:form action="{{ link('oauth-clients/toggle') }}" class="block" ajax="true">
+		<div class="block-outer">
+			<xf:macro template="filter_macros" name="quick_filter" arg-key="oauthClients" arg-class="block-outer-opposite" />
+		</div>
+		<div class="block-container">
+			<div class="block-body">
+				<xf:datalist>
+					<xf:foreach loop="$clients" value="$client">
+						<xf:datarow
+							label="{$client.label}"
+							href="{{ link('oauth-clients/edit', $client) }}"
+							delete="{{ link('oauth-clients/delete', $client) }}">
+							<xf:explain>
+								<ul class="listInline listInline--bullet">
+									<li>{$client.client_id_snippet}</li>
+									<li>
+										{{ phrase('created') }}:
+										<xf:date time="{$client.creation_date}"/>
+									</li>
+									<xf:if is="$client.last_use_date">
+										<li>
+											{{ phrase('last_used') }}:
+											<xf:date time="{$client.last_use_date}"/>
+										</li>
+									</xf:if>
+								</ul>
+							</xf:explain>
+							<xf:toggle name="active[{$client.client_id}]" selected="$client.active"
+								class="dataList-cell--separated" submit="true"
+								tooltip="{{ phrase('enable_disable_x', {'title': $client.label}) }}" />
+						</xf:datarow>
+					</xf:foreach>
+				</xf:datalist>
+			</div>
+		</div>
+	</xf:form>
+<xf:else />
+	<div class="blockMessage">{{ phrase('no_items_have_been_created_yet') }}</div>
+</xf:if>

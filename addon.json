@@ -1,0 +1,16 @@
+{
+  "legacy_addon_id": "",
+  "title": "API Improvements",
+  "description": "",
+  "version_id": 1000010,
+  "version_string": "1.0.0 Alpha",
+  "dev": "Liam Williams",
+  "dev_url": "https://lw-addons.net",
+  "faq_url": "",
+  "support_url": "",
+  "extra_urls": {
+    "Contribute on GitHub": "#"
+  },
+  "require": [],
+  "icon": ""
+}

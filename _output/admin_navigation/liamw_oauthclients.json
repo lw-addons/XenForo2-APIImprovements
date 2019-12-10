@@ -1,0 +1,10 @@
+{
+    "parent_navigation_id": "serviceProviders",
+    "display_order": 450,
+    "link": "oauth-clients",
+    "icon": "",
+    "admin_permission_id": "user",
+    "debug_only": false,
+    "development_only": false,
+    "hide_no_children": false
+}

@@ -1,0 +1,25 @@
+<xf:title>~~Grant account access~~</xf:title>
+
+<div class="block">
+	<div class="block-container">
+		<div class="block-body">
+			<p>{$client.label} is requesting access to your {$xf.options.boardTitle} account.</p>
+
+			<p>If you choose to grant this access, {$client.label} will have access to:</p>
+
+			<ul>
+				<li>~~All account data~~</li>
+			</ul>
+
+			<xf:button
+				href="{{ link('account/oauth2/authorize', null, {'client_id': $client.client_id, 'redirect_uri': $redirectUri, 'response_type': $responseType, 'state': $state, '_xfToken': csrf_token()}) }}">
+				~~Authorise {$client.label}~~
+			</xf:button>
+
+			<xf:button
+				href="{{ link('account/oauth2/deny', null, {'client_id': $client.client_id, 'redirect_uri': $redirectUri, 'response_type': $responseType, 'state': $state}) }}">
+				~~Deny {$client.label}~~
+			</xf:button>
+		</div>
+	</div>
+</div>
